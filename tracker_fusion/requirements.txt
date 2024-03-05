@@ -1,0 +1,1 @@
+ffmpeg -y -loglevel panic -i tracker.avi output.mp4
