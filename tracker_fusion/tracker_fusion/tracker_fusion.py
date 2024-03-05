@@ -149,7 +149,6 @@ class ImageSubscriber(Node):
             # Convert point cloud data to NumPy array         
             point_cloud = np.array(list(gen))
             # load lidar points and project them inside 2d detection
-            #point_cloud = np.asarray(o3d.io.read_point_cloud(pts[frame_num-1]).points) # original 11
             pts_3D, pts_2D = lu.get_lidar_on_image(lidar2cam, point_cloud, (image.shape[1], image.shape[0]))
             lidar_pts_img, _ = fu.lidar_camera_fusion(pts_3D, pts_2D, detections, image)
             # Build a 2D Object
@@ -235,12 +234,7 @@ class ImageSubscriber(Node):
                 cv2.rectangle(image, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), color, 2)
                 cv2.rectangle(image, (int(bbox[0]), int(bbox[1]-30)), (int(bbox[0])+(len(class_name)+len(str(track.track_id)))*17, int(bbox[1])), color, -1)
                 cv2.putText(image, class_name + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1]-10)),0, 0.75, (255,255,255),2)
-        
 
-            # if enable info flag then print details about each track
-                #if True:
-                    #print("Tracker ID: {}, Class: {},  BBox Coords (xmin, ymin, xmax, ymax): {}".format(str(track.track_id), class_name, (int(bbox[0]), int(bbox[1]),
-                    #int(bbox[2]), int(bbox[3]))))
             cv2.imwrite(os.path.join(out_dir,f"track_fusin{(self.frame_num-1)*2}.png"), image)      #PARES FUSION
             #cv2.imwrite(os.path.join(out_dir,f"track_fusin{frame_num*2-1}.png"), image)        #IMPARES YOLOV4
             # calculate frames per second of running detections
@@ -262,23 +256,9 @@ class ImageSubscriber(Node):
             #cv2.imshow("YOLO_img", yolo_detections)
             #key = cv2.waitKey(1)
             
-              
-    def info_callback(self, msg):
-        fx = msg.K[0]
-        fy = msg.K[4]
-        cx = msg.K[2]
-        cy = msg.K[5]
-        self.intrinsics = np.array([[fx, 0, cx],
-                                    [0, fy, cy],
-                                    [0, 0, 1]])
 
-        k1, k2, p1, p2, k3 = msg.D
-        self.distortions = np.array([k1, k2, p1, p2, k3])
 
     def lidar_callback(self, msg):
-        # Process Lidar data here
-        # For example, you can convert PointCloud2 message to a numpy array
-        #self.point_cloud_data = np.asarray(msg.data, dtype=np.float32).reshape(-1, 3)
         self.msgvelo = msg
         
         
